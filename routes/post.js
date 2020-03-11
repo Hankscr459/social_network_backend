@@ -6,7 +6,9 @@ const {
     postById,
     isPoster,
     deletePost,
-    updatePost
+    updatePost,
+    photo,
+    singlePost
 } = require('../controllers/post')
 const { requireSignin } = require('../controllers/auth')
 const { userById } = require('../controllers/user')
@@ -14,7 +16,7 @@ const { createPostValidator } = require('../Validator')
 
 const router = express.Router()
 
-router.get('/', requireSignin, getPosts)
+router.get('/posts',  getPosts)
 router.post(
     '/post/new/:userId',
     requireSignin,
@@ -23,9 +25,12 @@ router.post(
 )
 
 router.get('/post/by/:userId', requireSignin, postsByUser)
+router.get('/post/:postId', singlePost)
 router.delete('/post/:postId', requireSignin, isPoster, deletePost)
 router.put('/post/:postId', requireSignin, isPoster, updatePost)
 
+// photo
+router.get('/post/photo/:postId', photo)
 // any route containing :userId our app will first execute userById()
 router.param('userId', userById)
 router.param('postId', postById)

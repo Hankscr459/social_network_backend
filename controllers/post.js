@@ -20,9 +20,11 @@ exports.postById = (req, res, next, id) => {
 exports.getPosts = (req, res) => {
     res.posts = Post.find()
         .populate('postedBy', '_id name')
+        .select('_id title body created')
+        .sort({ created: -1 })
         .select('_id title body')
         .then(posts => {
-            res.json({ posts })
+            res.json(posts)
         })
         .catch(err => console.log(err))
 }
@@ -107,4 +109,13 @@ exports.updatePost = (req, res, next) => {
         }
         res.json(post)
     })
+}
+
+exports.photo = (req, res, next) => {
+    res.set('Content-type', req.post.photo.contentType)
+    return res.send(req.post.photo.data)
+}
+
+exports.singlePost = (req, res) => {
+    return res.json(req.post)
 }
