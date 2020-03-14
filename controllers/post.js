@@ -214,7 +214,7 @@ exports.uncomment = (req, res) => {
         { new: true }
     )
     .populate('comments.postedBy', '_id name' )
-    .populate('postBy', '_id name')
+    .populate('postedBy', '_id name')
     .exec((err, result) => {
         if(err) {
             return res.results(400).json({
