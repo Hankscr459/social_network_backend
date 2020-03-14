@@ -111,32 +111,68 @@ exports.forgotPassword = (req, res) => {
 // then we got the right user 
  
 exports.resetPassword = (req, res) => {
-    const { resetPasswordLink, newPassword } = req.body;
+    const { resetPasswordLink, newPassword } = req.body
  
     User.findOne({ resetPasswordLink }, (err, user) => {
         // if err or no user
         if (err || !user)
             return res.status("401").json({
                 error: "Invalid Link!"
-            });
+            })
  
         const updatedFields = {
             password: newPassword,
             resetPasswordLink: ""
-        };
+        }
  
         user = _.extend(user, updatedFields);
-        user.updated = Date.now();
+        user.updated = Date.now()
  
         user.save((err, result) => {
             if (err) {
                 return res.status(400).json({
                     error: err
-                });
+                })
             }
             res.json({
                 message: `Great! Now you can login with your new password.`
-            });
-        });
-    });
-};
+            })
+        })
+    })
+}
+
+exports.socialLogin = (req, res) => {
+    // try signup by finding user with req.email
+    let user = User.findOne({ email: req.body.email }, (err, user) => {
+        if (err || !user) {
+            // create a new user and login
+            user = new User(req.body)
+            req.profile = user
+            user.save()
+            // generate a token with user id and secret
+            const token = jwt.sign(
+                { _id: user._id, iss: "NODEAPI" },
+                process.env.JWT_SECRET
+            );
+            res.cookie("t", token, { expire: new Date() + 9999 })
+            // return response with user and token to frontend client
+            const { _id, name, email } = user
+            return res.json({ token, user: { _id, name, email } })
+        } else {
+            // update existing user with new social info and login
+            req.profile = user;
+            user = _.extend(user, req.body)
+            user.updated = Date.now()
+            user.save()
+            // generate a token with user id and secret
+            const token = jwt.sign(
+                { _id: user._id, iss: "NODEAPI" },
+                process.env.JWT_SECRET
+            );
+            res.cookie("t", token, { expire: new Date() + 9999 })
+            // return response with user and token to frontend client
+            const { _id, name, email } = user
+            return res.json({ token, user: { _id, name, email } })
+        }
+    })
+}

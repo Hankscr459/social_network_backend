@@ -4,12 +4,16 @@ const {
     signin, 
     signout,
     forgotPassword,
-    resetPassword
+    resetPassword,
+    socialLogin
 } = require('../controllers/auth')
 const { userById } = require('../controllers/user')
 const { userSignupValidator, passwordResetValidator } = require('../Validator')
 
 const router = express.Router()
+
+// then use this route for social login
+router.post("/social-login", socialLogin); 
 
 // password forgot and reset routes
 router.put("/forgot-password", forgotPassword);
