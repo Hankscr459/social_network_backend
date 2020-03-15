@@ -8,7 +8,6 @@ exports.postById = (req, res, next, id) => {
         .populate("postedBy", "_id name")
         .populate("comments.postedBy", "_id name")
         .populate("postedBy", "_id name role")
-        .select("_id title body created likes comments photo")
         .exec((err, post) => {
             if (err || !post) {
                 return res.status(400).json({
@@ -77,9 +76,25 @@ exports.postsByUser =(req, res) => {
         })
 }
 
+// exports.isPoster = (req, res, next) => {
+//     let isPoster =
+//         req.post && req.auth && req.post.postedBy._id == req.auth._id
+//     if (!isPoster) {
+//         return res.status(403).json({
+//             error: 'User is not authorized'
+//         })
+//     }
+//     next()
+// }
+
 exports.isPoster = (req, res, next) => {
-    let isPoster =
+    let sameUser = 
         req.post && req.auth && req.post.postedBy._id == req.auth._id
+    let adminUser = req.post && req.auth && req.auth.role === 'admin'
+    // console.log('req.post', req.post, 'req.auth', req.auth)
+    // console.log('SAMUSER: ', saneUser, 'ADMINUSER: ', adminUser)
+
+    let isPoster = sameUser || adminUser
     if (!isPoster) {
         return res.status(403).json({
             error: 'User is not authorized'
@@ -87,6 +102,7 @@ exports.isPoster = (req, res, next) => {
     }
     next()
 }
+
 
 exports.deletePost = (req, res) => {
     let post =req.post
