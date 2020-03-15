@@ -13,10 +13,10 @@ const { userSignupValidator, passwordResetValidator } = require('../Validator')
 const router = express.Router()
 
 // then use this route for social login
-router.post("/social-login", socialLogin); 
+router.post("/social-login", socialLogin)
 
 // password forgot and reset routes
-router.put("/forgot-password", forgotPassword);
+router.put("/forgot-password", forgotPassword)
 router.put("/reset-password", passwordResetValidator, resetPassword)
 
 router.post('/signup', userSignupValidator,signup)
